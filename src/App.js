@@ -34,7 +34,23 @@ const App = () => {
     fetchImages()
   }, [])
 
-  console.log(photos);
+  useEffect(() => {
+    const event = window.addEventListener('scroll', () => {
+      // Check the innerHeight of the window
+      // Check how far you've scrolled
+      // Check the document height
+
+      const innerHeight = window.innerHeight
+      const verticalScroll = window.scrollY
+      const documentHeight = document.body.scrollHeight
+
+      if (!loading && (innerHeight + verticalScroll) >= documentHeight - 2) {
+        // we are at the bottom of the document
+        console.log('It worked!')
+      }
+    })
+    return () => window.removeEventListener('scroll', event)
+  }, [])
 
   return(
     <main>
