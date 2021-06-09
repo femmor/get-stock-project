@@ -10,7 +10,7 @@ const searchUrl = `https://api.unsplash.com/search/photos/`
 const App = () => {
   const [loading, setLoading] = useState(false)
   const [photos, setPhotos] = useState([])
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(0)
   const [query, setQuery] = useState('')
 
   const fetchImages = async () => {
@@ -19,21 +19,22 @@ const App = () => {
     const urlPage = `&page=${page}`
     const urlQuery = `&query=${query}`
     // Use the search url only if there's something in the input
-    if (query !== '') {
+    if (query) {
       url = `${searchUrl}${clientID}${urlPage}${urlQuery}`
     } else {
       url = `${mainUrl}${clientID}${urlPage}`
     }
-
-    url = `${mainUrl}${clientID}${urlPage}`
     try {
       const response = await fetch(url)
       const data = await response.json()
       setPhotos((prevData) => {
-        if (query) {
-          return [...prevData, ...data.results]
+        if (query && page === 1) {
+          return data.results
+        }
+        else if (query) {
+          return [...prevData,...data.results]
         } else {
-          return [...prevData, ...data]
+          return [...prevData,...data]
         }
       })
       setLoading(false)
@@ -45,11 +46,12 @@ const App = () => {
 
   const handleSubmit = e => {
     e.preventDefault()
-    fetchImages()
+    setPage(1)
   }
 
   useEffect(() => {
     fetchImages()
+    // eslint-disable-next-line
   }, [page])
 
   useEffect(() => {
@@ -70,6 +72,7 @@ const App = () => {
       }
     })
     return () => window.removeEventListener('scroll', event)
+    // eslint-disable-next-line
   }, [])
 
   return(
