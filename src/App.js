@@ -10,15 +10,19 @@ const searchUrl = `https://api.unsplash.com/search/photos/`
 const App = () => {
   const [loading, setLoading] = useState(false)
   const [photos, setPhotos] = useState([])
+  const [page, setPage] = useState(1)
 
   const fetchImages = async () => {
     setLoading(true)
     let url;
-    url = `${mainUrl}${clientID}`
+    const urlPage = `&page=${page}`
+    url = `${mainUrl}${clientID}${urlPage}`
     try {
       const response = await fetch(url)
       const data = await response.json()
-      setPhotos(data)
+      setPhotos((prevData) => {
+        return [...prevData, ...data]
+      })
       setLoading(false)
     } catch (error) {
       setLoading(false)
@@ -32,7 +36,7 @@ const App = () => {
 
   useEffect(() => {
     fetchImages()
-  }, [])
+  }, [page])
 
   useEffect(() => {
     const event = window.addEventListener('scroll', () => {
@@ -46,7 +50,9 @@ const App = () => {
 
       if (!loading && (innerHeight + verticalScroll) >= documentHeight - 2) {
         // we are at the bottom of the document
-        console.log('It worked!')
+        setPage(prevPage => {
+          return prevPage + 1
+        })
       }
     })
     return () => window.removeEventListener('scroll', event)
